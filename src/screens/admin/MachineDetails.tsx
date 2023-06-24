@@ -22,7 +22,6 @@ const MachineDetails = (props: any) => {
   const id = props.route.params.id;
   const navigation = useNavigation<any>();
   const [user, setUser] = useState<any>({});
-  const [file, setFile] = useState("");
   const [informerModal, setInformerModal] = useState(false);
   const [show, setShow] = useState(false);
   const [open, setOpen] = useState(false);
@@ -30,6 +29,7 @@ const MachineDetails = (props: any) => {
   const [visits, setVisits] = useState<any>({});
   const [admin, setAdmin] = useState(false);
   const [contracted, setContracted] = useState(false);
+  const [file, setFile] = useState("");
   const pickDocument = async () => {
     let result = (await DocumentPicker.getDocumentAsync({})) as any;
     setFile(result?.uri);
@@ -78,7 +78,7 @@ const MachineDetails = (props: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Utilisateurs Details</Text>
+        <Text style={styles.title}>Machine Details</Text>
       </View>
       <View style={styles.headerCard}>
         <View style={styles.boxContainer}>
@@ -195,7 +195,7 @@ const MachineDetails = (props: any) => {
             flexDirection: "row",
           }}
         >
-          <Text style={[styles.title]}>Liste des Machines</Text>
+          <Text style={[styles.title]}>Liste des Visites</Text>
           <TouchableOpacity
             onPress={() => setOpen(true)}
             style={{

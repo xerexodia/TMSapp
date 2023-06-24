@@ -7,6 +7,7 @@ import AdminMain from "./src/routes/admin/AdminMain";
 import { NavigationContainer } from "@react-navigation/native";
 import Main from "./src/routes/Main";
 import AuthContext, { useAuthContext } from "./src/context/AuthContext";
+import Scanner from "./src/components/Scanner";
 export default function App() {
   const { user } = useAuthContext();
   console.log(user);

@@ -6,6 +6,7 @@ import Profile from "../../screens/client/Profile";
 import Material from "../../screens/client/Material";
 import ContactAdmin from "../../screens/client/ContactAdmin";
 import BonCommande from "../../screens/client/BonCommande";
+import { useAuthContext } from "../../context/AuthContext";
 
 const Stack = createStackNavigator();
 
@@ -26,6 +27,7 @@ const ProfileNav = () => {
 
 const Drawer = createDrawerNavigator();
 const ClientMain = () => {
+  const { user } = useAuthContext();
   return (
     <Drawer.Navigator
       initialRouteName="Materials"
@@ -35,7 +37,9 @@ const ClientMain = () => {
     >
       <Drawer.Screen name="Materials" component={ProfileNav} />
       <Drawer.Screen name="Contact" component={ContactAdmin} />
-      <Drawer.Screen name="Bon" component={BonCommande} />
+      {!user.isContracted && (
+        <Drawer.Screen name="Bon" component={BonCommande} />
+      )}
 
       <Drawer.Screen name="Profile" component={Profile} />
     </Drawer.Navigator>

@@ -16,6 +16,7 @@ import Input from "../../components/Input";
 import { Formik } from "formik";
 import { Checkbox } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import Scanner from "../../components/Scanner";
 
 const Users = () => {
   const navigation = useNavigation<any>();

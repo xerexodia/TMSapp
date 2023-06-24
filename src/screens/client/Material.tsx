@@ -23,7 +23,7 @@ const Material = () => {
   console.log(user.id);
   const [machines, setMachines] = useState([]);
   const getMachines = async () => {
-    return await axios.get(`${url}MyMachine/MyMachines?clientId${user.id}`);
+    return await axios.get(`${url}MyMachine/MyMachines?clientId=${user.id}`);
   };
   console.log(machines);
   useEffect(() => {

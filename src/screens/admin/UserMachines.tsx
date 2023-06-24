@@ -17,6 +17,7 @@ import KeyboardWrapper from "../../components/KeyBoardWrapper";
 import { Formik } from "formik";
 import Modal from "react-native-modal";
 import { Checkbox } from "react-native-paper";
+import Scanner from "../../components/Scanner";
 
 const UserMachines = (props: any) => {
   const id = props.route.params.id;
@@ -25,6 +26,8 @@ const UserMachines = (props: any) => {
   const [file, setFile] = useState("");
   const [informerModal, setInformerModal] = useState(false);
   const [show, setShow] = useState(false);
+  const [scanner, setScanner] = useState(false);
+  const [scanData, setScanData] = useState({});
   const [open, setOpen] = useState(false);
   const [machines, setMachines] = useState<any>([]);
   const [admin, setAdmin] = useState(false);
@@ -76,392 +79,420 @@ const UserMachines = (props: any) => {
   }, []);
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Utilisateurs Details</Text>
-      </View>
-      <View style={styles.headerCard}>
-        <View style={styles.boxContainer}>
-          <View>
-            <Text style={styles.text}>id: {user.id}</Text>
-            <Text style={styles.text}>email: {user.emailAddress}</Text>
-            <Text style={styles.text}>name: {user.userName}</Text>
-          </View>
-          <View style={{ marginLeft: 10 }}>
-            <Text style={styles.text}>téléphone: {user.phoneNumber}</Text>
-            <Text style={styles.text}>
-              isContracted: {Boolean(user.isContacted).toString()}
-            </Text>
-            <Text style={styles.text}>
-              isAdmin: {Boolean(user.isAdmin).toString()}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.buttons}>
-          <TouchableOpacity
-            onPress={deleteUser}
-            style={{
-              backgroundColor: "red",
-              borderRadius: 13,
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-            }}
-          >
-            <Text
-              style={{
-                fontWeight: "500",
-                color: "white",
-              }}
-            >
-              Supprimer
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setShow(true);
-            }}
-            style={{
-              backgroundColor: "orange",
-              borderRadius: 13,
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-            }}
-          >
-            <Text
-              style={{
-                fontWeight: "500",
-                color: "white",
-              }}
-            >
-              update
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setInformerModal(true)}
-            style={{
-              backgroundColor: "grey",
-              borderRadius: 13,
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-            }}
-          >
-            <Text
-              style={{
-                fontWeight: "500",
-                color: "white",
-              }}
-            >
-              informer
-            </Text>
-          </TouchableOpacity>
-          {/* informer modal */}
-          <Modal
-            style={{ margin: 0 }}
-            isVisible={informerModal}
-            onBackdropPress={() => setInformerModal(false)}
-            backdropOpacity={0.1}
-            swipeDirection={"down"}
-            scrollHorizontal={true}
-            avoidKeyboard={true}
-            onSwipeComplete={() => setInformerModal(false)}
-          >
-            <View style={styles.postModalContainer}>
-              <KeyboardWrapper>
-                <Formik
-                  initialValues={{
-                    Message: "",
-                  }}
-                  onSubmit={async (values) => {
-                    informer(values);
-                  }}
-                >
-                  {({
-                    values,
-                    handleChange,
-                    errors,
-                    setFieldTouched,
-                    touched,
-                    isValid,
-                    handleSubmit,
-                  }) => (
-                    <View>
-                      <Input
-                        label="Message:"
-                        onBlur={() => setFieldTouched("Message")}
-                        onChangeText={handleChange("Message")}
-                        placeholder="message"
-                        error={
-                          touched.Message && errors.Message
-                            ? errors.Message
-                            : null
-                        }
-                        value={values.Message}
-                      />
-                      <View style={styles.spacing} />
-
-                      <Button title="Ajouter fichier" onPress={pickDocument} />
-                      <View style={styles.spacing} />
-                      <Button title="Informer" onPress={handleSubmit} />
-                      <View style={styles.spacing} />
-                    </View>
-                  )}
-                </Formik>
-              </KeyboardWrapper>
-            </View>
-          </Modal>
-          {/* updateModal */}
-          <Modal
-            style={{ margin: 0 }}
-            isVisible={show}
-            onBackdropPress={() => setShow(false)}
-            backdropOpacity={0.1}
-            swipeDirection={"down"}
-            scrollHorizontal={true}
-            avoidKeyboard={true}
-            onSwipeComplete={() => setShow(false)}
-          >
-            <View style={styles.postModalContainer2}>
-              <KeyboardWrapper>
-                <Formik
-                  initialValues={{
-                    userName: user.userName,
-                    password: "",
-                    emailAddress: user.emailAddress,
-                    phoneNumber: user.phoneNumber,
-                  }}
-                  onSubmit={async (values) => {
-                    await axios
-                      .patch(`${url}Profile/User/${id}`, {
-                        userName: values.userName,
-                        emailAddress: values.emailAddress,
-                        password: values.password,
-                        isAdmin: admin ? 1 : 0,
-                        isContracted: contracted ? 1 : 0,
-                        phoneNumber: values.phoneNumber,
-                      })
-                      .then((res) => {
-                        console.log(res.data);
-                        setShow(false);
-                      })
-                      .catch((err) => {
-                        console.log(err);
-                      });
-                  }}
-                >
-                  {({
-                    values,
-                    handleChange,
-                    errors,
-                    setFieldTouched,
-                    touched,
-                    isValid,
-                    handleSubmit,
-                  }) => (
-                    <View>
-                      <Input
-                        label="E-mail:"
-                        onBlur={() => setFieldTouched("emailAddress")}
-                        onChangeText={handleChange("emailAddress")}
-                        placeholder="email@email.com"
-                        value={values.emailAddress}
-                      />
-                      <View style={styles.spacing} />
-                      <Input
-                        label="Password:"
-                        placeholder="*********"
-                        onBlur={() => setFieldTouched("password")}
-                        onChangeText={handleChange("password")}
-                        secureTextEntry={true}
-                        value={values.password}
-                        error={
-                          touched.password && errors.password
-                            ? errors.password
-                            : null
-                        }
-                      />
-                      <Input
-                        label="Name:"
-                        placeholder="name"
-                        onBlur={() => setFieldTouched("userName")}
-                        onChangeText={handleChange("userName")}
-                        value={values.userName}
-                      />
-                      <Input
-                        label="Telephone:"
-                        placeholder="33 200 100"
-                        onBlur={() => setFieldTouched("phoneNumber")}
-                        onChangeText={handleChange("phoneNumber")}
-                        value={values.phoneNumber}
-                      />
-
-                      <View style={styles.spacing} />
-                      <Checkbox.Item
-                        label="is Admin"
-                        status={admin ? "checked" : "unchecked"}
-                        onPress={() => setAdmin(!admin)}
-                      />
-                      <Checkbox.Item
-                        label="is Contracted"
-                        status={contracted ? "checked" : "unchecked"}
-                        onPress={() => setContracted(!contracted)}
-                      />
-                      <View style={styles.spacing} />
-                      <Button title="Submit" onPress={handleSubmit} />
-                      <View style={styles.spacing} />
-                    </View>
-                  )}
-                </Formik>
-              </KeyboardWrapper>
-            </View>
-          </Modal>
-        </View>
-      </View>
-      <View style={{ flex: 0.7, paddingTop: 20 }}>
-        <View
-          style={{
-            flex: 0.1,
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexDirection: "row",
+      {scanner ? (
+        <Scanner
+          getData={(data) => {
+            setScanData(data), setScanner(false);
           }}
-        >
-          <Text style={[styles.title]}>Liste des Machines</Text>
-          <TouchableOpacity
-            onPress={() => setOpen(true)}
-            style={{
-              backgroundColor: colors.brand,
-              borderRadius: 13,
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-            }}
-          >
-            <Text style={{ fontWeight: "500", color: "white" }}>Ajouter</Text>
-          </TouchableOpacity>
-          {/* add machine modal*/}
-          <Modal
-            style={{ margin: 0 }}
-            isVisible={open}
-            onBackdropPress={() => setOpen(false)}
-            backdropOpacity={0.1}
-            swipeDirection={"down"}
-            scrollHorizontal={true}
-            avoidKeyboard={true}
-            onSwipeComplete={() => setOpen(false)}
-          >
-            <View style={[styles.postModalContainer, { height: "60%" }]}>
-              <KeyboardWrapper>
-                <Formik
-                  initialValues={{
-                    serialNumber: "",
-                    machineType: "",
-                    sellDate: "",
-                  }}
-                  onSubmit={async (values) => {
-                    try {
-                      const data = await axios.post(
-                        `${url}Machine/AddMachine`,
-                        {
-                          id,
-                          ...values,
-                        }
-                      );
-                      if (data) {
-                        setMachines((prev: any) => [...prev, data.data]);
-                        setOpen(false);
-                      }
-                    } catch (error) {
-                      console.log(error);
-                    }
+        />
+      ) : (
+        <>
+          <View style={styles.header}>
+            <Text style={styles.title}>Utilisateurs Details</Text>
+          </View>
+          <View style={styles.headerCard}>
+            <View style={styles.boxContainer}>
+              <View>
+                <Text style={styles.text}>id: {user.id}</Text>
+                <Text style={styles.text}>email: {user.emailAddress}</Text>
+                <Text style={styles.text}>name: {user.userName}</Text>
+              </View>
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.text}>téléphone: {user.phoneNumber}</Text>
+                <Text style={styles.text}>
+                  isContracted: {Boolean(user.isContacted).toString()}
+                </Text>
+                <Text style={styles.text}>
+                  isAdmin: {Boolean(user.isAdmin).toString()}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.buttons}>
+              <TouchableOpacity
+                onPress={deleteUser}
+                style={{
+                  backgroundColor: "red",
+                  borderRadius: 13,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "500",
+                    color: "white",
                   }}
                 >
-                  {({
-                    values,
-                    handleChange,
-                    errors,
-                    setFieldTouched,
-                    touched,
-                    isValid,
-                    handleSubmit,
-                  }) => (
-                    <View>
-                      <Input
-                        label="serialNumber:"
-                        onBlur={() => setFieldTouched("serialNumber")}
-                        onChangeText={handleChange("serialNumber")}
-                        placeholder="serialNumber"
-                        error={
-                          touched.serialNumber && errors.serialNumber
-                            ? errors.serialNumber
-                            : null
-                        }
-                        value={values.serialNumber}
-                      />
-                      <View style={styles.spacing} />
-                      <Input
-                        label="machineType:"
-                        onBlur={() => setFieldTouched("machineType")}
-                        onChangeText={handleChange("machineType")}
-                        placeholder="machineType"
-                        error={
-                          touched.machineType && errors.machineType
-                            ? errors.machineType
-                            : null
-                        }
-                        value={values.machineType}
-                      />
-                      <View style={styles.spacing} />
-                      <Input
-                        label="sellDate:"
-                        onBlur={() => setFieldTouched("sellDate")}
-                        onChangeText={handleChange("sellDate")}
-                        placeholder="sellDate"
-                        error={
-                          touched.sellDate && errors.sellDate
-                            ? errors.sellDate
-                            : null
-                        }
-                        value={values.sellDate}
-                      />
-                      <View style={styles.spacing} />
-
-                      <Button title="Informer" onPress={handleSubmit} />
-                      <View style={styles.spacing} />
-                    </View>
-                  )}
-                </Formik>
-              </KeyboardWrapper>
-            </View>
-          </Modal>
-        </View>
-        <ScrollView
-          style={{ flex: 0.9, paddingTop: 10 }}
-          contentContainerStyle={{ paddingBottom: 10 }}
-        >
-          {machines?.length > 0 ? (
-            machines?.map((item: any, idx: number) => (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("MachineDetails", {
-                    id: item.serialNumber,
-                  })
-                }
-                key={idx}
-                style={styles.card}
-              >
-                <Text style={styles.text}>
-                  serial number: {item.serialNumber}
+                  Supprimer
                 </Text>
-                <Text style={styles.text}>
-                  machine Type: {item.machineType}
-                </Text>
-                <Text style={styles.text}>sell Date: {item.sellDate}</Text>
-                <Text style={styles.text}>user id: {item.userId}</Text>
               </TouchableOpacity>
-            ))
-          ) : (
-            <Text>No machines yet</Text>
-          )}
-        </ScrollView>
-      </View>
+              <TouchableOpacity
+                onPress={() => {
+                  setShow(true);
+                }}
+                style={{
+                  backgroundColor: "orange",
+                  borderRadius: 13,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "500",
+                    color: "white",
+                  }}
+                >
+                  update
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setInformerModal(true)}
+                style={{
+                  backgroundColor: "grey",
+                  borderRadius: 13,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontWeight: "500",
+                    color: "white",
+                  }}
+                >
+                  informer
+                </Text>
+              </TouchableOpacity>
+              {/* informer modal */}
+              <Modal
+                style={{ margin: 0 }}
+                isVisible={informerModal}
+                onBackdropPress={() => setInformerModal(false)}
+                backdropOpacity={0.1}
+                swipeDirection={"down"}
+                scrollHorizontal={true}
+                avoidKeyboard={true}
+                onSwipeComplete={() => setInformerModal(false)}
+              >
+                <View style={styles.postModalContainer}>
+                  <KeyboardWrapper>
+                    <Formik
+                      initialValues={{
+                        Message: "",
+                      }}
+                      onSubmit={async (values) => {
+                        informer(values);
+                      }}
+                    >
+                      {({
+                        values,
+                        handleChange,
+                        errors,
+                        setFieldTouched,
+                        touched,
+                        isValid,
+                        handleSubmit,
+                      }) => (
+                        <View>
+                          <Input
+                            label="Message:"
+                            onBlur={() => setFieldTouched("Message")}
+                            onChangeText={handleChange("Message")}
+                            placeholder="message"
+                            error={
+                              touched.Message && errors.Message
+                                ? errors.Message
+                                : null
+                            }
+                            value={values.Message}
+                          />
+                          <View style={styles.spacing} />
+
+                          <Button
+                            title="Ajouter fichier"
+                            onPress={pickDocument}
+                          />
+                          <View style={styles.spacing} />
+                          <Button title="Informer" onPress={handleSubmit} />
+                          <View style={styles.spacing} />
+                        </View>
+                      )}
+                    </Formik>
+                  </KeyboardWrapper>
+                </View>
+              </Modal>
+              {/* updateModal */}
+              <Modal
+                style={{ margin: 0 }}
+                isVisible={show}
+                onBackdropPress={() => setShow(false)}
+                backdropOpacity={0.1}
+                swipeDirection={"down"}
+                scrollHorizontal={true}
+                avoidKeyboard={true}
+                onSwipeComplete={() => setShow(false)}
+              >
+                <View style={styles.postModalContainer2}>
+                  <KeyboardWrapper>
+                    <Formik
+                      initialValues={{
+                        userName: user.userName,
+                        password: "",
+                        emailAddress: user.emailAddress,
+                        phoneNumber: user.phoneNumber,
+                      }}
+                      onSubmit={async (values) => {
+                        await axios
+                          .patch(`${url}Profile/User/${id}`, {
+                            userName: values.userName,
+                            emailAddress: values.emailAddress,
+                            password: values.password,
+                            isAdmin: admin ? 1 : 0,
+                            isContracted: contracted ? 1 : 0,
+                            phoneNumber: values.phoneNumber,
+                          })
+                          .then((res) => {
+                            console.log(res.data);
+                            setShow(false);
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                          });
+                      }}
+                    >
+                      {({
+                        values,
+                        handleChange,
+                        errors,
+                        setFieldTouched,
+                        touched,
+                        isValid,
+                        handleSubmit,
+                      }) => (
+                        <View>
+                          <Input
+                            label="E-mail:"
+                            onBlur={() => setFieldTouched("emailAddress")}
+                            onChangeText={handleChange("emailAddress")}
+                            placeholder="email@email.com"
+                            value={values.emailAddress}
+                          />
+                          <View style={styles.spacing} />
+                          <Input
+                            label="Password:"
+                            placeholder="*********"
+                            onBlur={() => setFieldTouched("password")}
+                            onChangeText={handleChange("password")}
+                            secureTextEntry={true}
+                            value={values.password}
+                            error={
+                              touched.password && errors.password
+                                ? errors.password
+                                : null
+                            }
+                          />
+                          <Input
+                            label="Name:"
+                            placeholder="name"
+                            onBlur={() => setFieldTouched("userName")}
+                            onChangeText={handleChange("userName")}
+                            value={values.userName}
+                          />
+                          <Input
+                            label="Telephone:"
+                            placeholder="33 200 100"
+                            onBlur={() => setFieldTouched("phoneNumber")}
+                            onChangeText={handleChange("phoneNumber")}
+                            value={values.phoneNumber}
+                          />
+
+                          <View style={styles.spacing} />
+                          <Checkbox.Item
+                            label="is Admin"
+                            status={admin ? "checked" : "unchecked"}
+                            onPress={() => setAdmin(!admin)}
+                          />
+                          <Checkbox.Item
+                            label="is Contracted"
+                            status={contracted ? "checked" : "unchecked"}
+                            onPress={() => setContracted(!contracted)}
+                          />
+                          <View style={styles.spacing} />
+                          <Button title="Submit" onPress={handleSubmit} />
+                          <View style={styles.spacing} />
+                        </View>
+                      )}
+                    </Formik>
+                  </KeyboardWrapper>
+                </View>
+              </Modal>
+            </View>
+          </View>
+          <View style={{ flex: 0.7, paddingTop: 20 }}>
+            <View
+              style={{
+                flex: 0.1,
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={[styles.title]}>Liste des Machines</Text>
+              <TouchableOpacity
+                onPress={() => setOpen(true)}
+                style={{
+                  backgroundColor: colors.brand,
+                  borderRadius: 13,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                }}
+              >
+                <Text style={{ fontWeight: "500", color: "white" }}>
+                  Ajouter
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setScanner(true)}
+                style={{
+                  backgroundColor: colors.brand,
+                  borderRadius: 13,
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                }}
+              >
+                <Text style={{ fontWeight: "500", color: "white" }}>Scan</Text>
+              </TouchableOpacity>
+              {/*  */}
+
+              {/* add machine modal*/}
+              <Modal
+                style={{ margin: 0 }}
+                isVisible={open}
+                onBackdropPress={() => setOpen(false)}
+                backdropOpacity={0.1}
+                swipeDirection={"down"}
+                scrollHorizontal={true}
+                avoidKeyboard={true}
+                onSwipeComplete={() => setOpen(false)}
+              >
+                <View style={[styles.postModalContainer, { height: "60%" }]}>
+                  <KeyboardWrapper>
+                    <Formik
+                      initialValues={{
+                        serialNumber: "",
+                        machineType: "",
+                        sellDate: "",
+                      }}
+                      onSubmit={async (values) => {
+                        try {
+                          const data = await axios.post(
+                            `${url}Machine/AddMachine`,
+                            {
+                              id,
+                              ...values,
+                            }
+                          );
+                          if (data) {
+                            setMachines((prev: any) => [...prev, data.data]);
+                            setOpen(false);
+                          }
+                        } catch (error) {
+                          console.log(error);
+                        }
+                      }}
+                    >
+                      {({
+                        values,
+                        handleChange,
+                        errors,
+                        setFieldTouched,
+                        touched,
+                        isValid,
+                        handleSubmit,
+                      }) => (
+                        <View>
+                          <Input
+                            label="serialNumber:"
+                            onBlur={() => setFieldTouched("serialNumber")}
+                            onChangeText={handleChange("serialNumber")}
+                            placeholder="serialNumber"
+                            error={
+                              touched.serialNumber && errors.serialNumber
+                                ? errors.serialNumber
+                                : null
+                            }
+                            value={values.serialNumber}
+                          />
+                          <View style={styles.spacing} />
+                          <Input
+                            label="machineType:"
+                            onBlur={() => setFieldTouched("machineType")}
+                            onChangeText={handleChange("machineType")}
+                            placeholder="machineType"
+                            error={
+                              touched.machineType && errors.machineType
+                                ? errors.machineType
+                                : null
+                            }
+                            value={values.machineType}
+                          />
+                          <View style={styles.spacing} />
+                          <Input
+                            label="sellDate:"
+                            onBlur={() => setFieldTouched("sellDate")}
+                            onChangeText={handleChange("sellDate")}
+                            placeholder="sellDate"
+                            error={
+                              touched.sellDate && errors.sellDate
+                                ? errors.sellDate
+                                : null
+                            }
+                            value={values.sellDate}
+                          />
+                          <View style={styles.spacing} />
+
+                          <Button title="Informer" onPress={handleSubmit} />
+                          <View style={styles.spacing} />
+                        </View>
+                      )}
+                    </Formik>
+                  </KeyboardWrapper>
+                </View>
+              </Modal>
+            </View>
+            <ScrollView
+              style={{ flex: 0.9, paddingTop: 10 }}
+              contentContainerStyle={{ paddingBottom: 10 }}
+            >
+              {machines?.length > 0 ? (
+                machines?.map((item: any, idx: number) => (
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("MachineDetails", {
+                        id: item.serialNumber,
+                      })
+                    }
+                    key={idx}
+                    style={styles.card}
+                  >
+                    <Text style={styles.text}>
+                      serial number: {item.serialNumber}
+                    </Text>
+                    <Text style={styles.text}>
+                      machine Type: {item.machineType}
+                    </Text>
+                    <Text style={styles.text}>sell Date: {item.sellDate}</Text>
+                    <Text style={styles.text}>user id: {item.userId}</Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text>No machines yet</Text>
+              )}
+            </ScrollView>
+          </View>
+        </>
+      )}
     </View>
   );
 };
